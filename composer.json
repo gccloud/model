@@ -1,0 +1,22 @@
+{
+    "name": "gccloud/model",
+    "keywords": ["Parser", "library", "codeigniter"],
+    "description": "CodeIgniter 3 Model extension, working with maltyxx Origami package",
+    "homepage": "https://github.com/gccloud/model",
+    "license": "Apache-2.0",
+    "type": "codeigniter-third-party",
+    "authors": [
+        {
+            "name": "Gregory Carrodano",
+            "email": "g.carrodano@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "composer/installers": "1.0.*"
+    },
+    "extra": {
+        "installer-name": "model"
+    }
+}
