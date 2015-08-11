@@ -1,4 +1,4 @@
-# model
+# CodeIgniter Model
 CodeIgniter 3 Model extension using maltyyx/origami package
 
 ## Requirements
