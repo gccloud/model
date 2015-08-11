@@ -84,7 +84,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * Other Models dependencies declaration
+     * Other CI Models dependencies declaration
      * @param array
      */
     protected function add_models($data = array()) {
@@ -103,7 +103,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Stores entity query for futur object remap
-     * @param [type] $data [description]
+     * @param mixed
      */
     protected function save_result($data = array()) {
         if( ! is_array($data)) {
@@ -129,10 +129,7 @@ class MY_Model extends CI_Model {
         }
 
         if( ! empty($data)) {
-            foreach($data as $d) {
-                $temp[] = $d;
-            }
-            $this->_db_result[] = $temp;
+            $this->_db_result = $data;
         }
     }
 
@@ -208,14 +205,12 @@ class MY_Model extends CI_Model {
         $return = array();
 
         if( ! empty($this->_db_result)) {
-            foreach($this->_db_result as $db_line) {
+            foreach($this->_db_result as $d) {
                 $new_instance = new static();
-                foreach($db_line as $d) {
-                    $new_instance->_remap($d);
-                    $new_instance->_db_result = NULL;
-                }
-                $return[] = $new_instance;
+                $new_instance->_remap($d);
+                $new_instance->_db_result = NULL;
             }
+            $return[] = $new_instance;
         }
 
         $this->_clear();
