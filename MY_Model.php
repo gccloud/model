@@ -65,6 +65,19 @@ class MY_Model extends CI_Model {
     }
 
     /**
+     * __get magic
+     * @param  mixed
+     */
+    public function __set($key, $value) {
+        if(isset($this->$key)) {
+            $this->$key = $value;
+        }
+        else {
+            show_error('Unable to access property : '.get_class($this).'::'.$key);
+        }
+    }
+
+    /**
      * ORigaMi Entities dependencies declaration
      * @param  array
      */
