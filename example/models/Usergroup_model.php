@@ -21,10 +21,10 @@ class Usergroup_model extends MY_Model {
         $usergroup_entity = new \Entity\mymodelexample\enumusergroup($usergroup_id);
 
         // Stores entity result
-        $this->save_result($usergroup_entity);
+        $this->store_result($usergroup_entity);
 
         // Remaps entities results and returns a new instance
-        return parent::_get();
+        return $this->_get();
     }
 
     /**
@@ -40,10 +40,10 @@ class Usergroup_model extends MY_Model {
             ->find();
 
         // Stores entity result
-        $this->save_result_list($usergroup_list);
+        $this->store_result_list($usergroup_list);
 
         // Remaps entities results and returns a new instance
-        return parent::_get_list();
+        return $this->_get_list();
     }
 
 }

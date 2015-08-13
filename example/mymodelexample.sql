@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  localhost
--- Généré le :  Jeu 13 Août 2015 à 12:21
+-- Généré le :  Jeu 13 Août 2015 à 15:39
 -- Version du serveur :  5.6.25-1~dotdeb+7.1
 -- Version de PHP :  5.4.43-1~dotdeb+7.1
 
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `city` (
   `zipcode` varchar(255) NOT NULL,
   `dateinsert` datetime NOT NULL,
   `dateupdate` datetime NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 --
 -- Contenu de la table `city`
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `country` (
   `iso` varchar(255) NOT NULL,
   `dateinsert` datetime NOT NULL,
   `dateupdate` datetime NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 --
 -- Contenu de la table `country`
@@ -87,20 +87,20 @@ INSERT INTO `country` (`id`, `label`, `iso`, `dateinsert`, `dateupdate`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `enumusergroup_id`
+-- Structure de la table `enumusergroup`
 --
 
-CREATE TABLE IF NOT EXISTS `enumusergroup_id` (
+CREATE TABLE IF NOT EXISTS `enumusergroup` (
   `id` int(10) unsigned NOT NULL,
   `label` varchar(255) NOT NULL,
   `constant` varchar(255) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 --
--- Contenu de la table `enumusergroup_id`
+-- Contenu de la table `enumusergroup`
 --
 
-INSERT INTO `enumusergroup_id` (`id`, `label`, `constant`) VALUES
+INSERT INTO `enumusergroup` (`id`, `label`, `constant`) VALUES
 (1, 'Super Administrator', 'SUPERADMIN'),
 (2, 'Administrator', 'ADMIN');
 
@@ -113,7 +113,7 @@ INSERT INTO `enumusergroup_id` (`id`, `label`, `constant`) VALUES
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(10) unsigned NOT NULL,
   `enumusergroup_id` int(10) unsigned NOT NULL,
-  `address_id` int(10) unsigned NOT NULL,
+  `address_id` int(10) unsigned DEFAULT NULL,
   `lastname` varchar(255) NOT NULL,
   `firstname` varchar(255) NOT NULL,
   `dateinsert` datetime NOT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 
 INSERT INTO `user` (`id`, `enumusergroup_id`, `address_id`, `lastname`, `firstname`, `dateinsert`, `dateupdate`) VALUES
-(1, 1, 1, 'Test', 'User', '2015-08-13 00:00:00', '2015-08-13 00:00:00'),
+(1, 1, 1, 'Test 4', 'User 4', '2015-08-13 00:00:00', '2015-08-13 13:07:06'),
 (2, 2, 2, 'Test 2', 'Test 2', '2015-08-13 00:00:00', '2015-08-13 00:00:00');
 
 --
@@ -153,9 +153,9 @@ ALTER TABLE `country`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `enumusergroup_id`
+-- Index pour la table `enumusergroup`
 --
-ALTER TABLE `enumusergroup_id`
+ALTER TABLE `enumusergroup`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -179,16 +179,16 @@ ALTER TABLE `address`
 -- AUTO_INCREMENT pour la table `city`
 --
 ALTER TABLE `city`
-  MODIFY `id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+  MODIFY `id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `country`
 --
 ALTER TABLE `country`
-  MODIFY `id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+  MODIFY `id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
--- AUTO_INCREMENT pour la table `enumusergroup_id`
+-- AUTO_INCREMENT pour la table `enumusergroup`
 --
-ALTER TABLE `enumusergroup_id`
+ALTER TABLE `enumusergroup`
   MODIFY `id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `user`
@@ -216,7 +216,7 @@ ALTER TABLE `city`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `address_id` FOREIGN KEY (`address_id`) REFERENCES `address` (`id`),
-  ADD CONSTRAINT `enumusergroup_id` FOREIGN KEY (`enumusergroup_id`) REFERENCES `enumusergroup_id` (`id`);
+  ADD CONSTRAINT `enumusergroup_id` FOREIGN KEY (`enumusergroup_id`) REFERENCES `enumusergroup` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

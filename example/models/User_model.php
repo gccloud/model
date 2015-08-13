@@ -39,10 +39,10 @@ class User_model extends MY_Model {
         $user_entity->save();
 
         // Stores entity result
-        $this->save_result($user_entity);
+        $this->store_result($user_entity);
 
         // Remaps entities results and creates a new instance
-        return parent::_insert(); 
+        return $this->_insert(); 
     }
 
     /**
@@ -54,10 +54,10 @@ class User_model extends MY_Model {
         $user_entity = new \Entity\mymodelexample\user($user_id);
 
         // Stores entity result
-        $this->save_result($user_entity);
+        $this->store_result($user_entity);
 
         // Remaps entities results and creates a new instance
-        $user = parent::_get(); 
+        $user = $this->_get(); 
 
         // Calls other models attached to this one
         $user->get_address();
@@ -82,10 +82,10 @@ class User_model extends MY_Model {
             ->find();
 
         // Stores entity result
-        $this->save_result_list($user_list);
+        $this->store_result_list($user_list);
 
         // Remaps entities results and returns the instance list
-        return parent::_get_list();
+        return $this->_get_list();
     }
 
     /**
@@ -107,7 +107,7 @@ class User_model extends MY_Model {
         // Loops on every entity result
         foreach($entity_result as $entity) {        
             // Stores entity result
-            $this->save_result($entity);
+            $this->store_result($entity);
 
             // Remaps entities results and creates a new instance
             $user = parent::_get(); 
@@ -140,10 +140,10 @@ class User_model extends MY_Model {
         $user_entity->save();
 
         // Stores entity result
-        $this->save_result($user_entity);
+        $this->store_result($user_entity);
 
         // Updates the instance
-        parent::_set();
+        $this->_set();
     }
 
     /**

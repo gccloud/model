@@ -32,10 +32,10 @@ class Address_model extends MY_Model {
         $address_entity->save();
 
         // Stores entity result
-        $this->save_result($address_entity);
+        $this->store_result($address_entity);
 
         // Remaps entities results and returns a new instance
-        return parent::_insert();
+        return $this->_insert();
     }
 
     /**
@@ -83,10 +83,10 @@ class Address_model extends MY_Model {
         $country_entity = $city_entity->country()->find_one();
 
         // Stores entity result
-        $this->save_result(array($address_entity, $city_entity, $country_entity));
+        $this->store_result(array($address_entity, $city_entity, $country_entity));
 
         // Remaps entities results and returns a new instance
-        return parent::_get();
+        return $this->_get();
     }
 
     /**
@@ -105,10 +105,10 @@ class Address_model extends MY_Model {
         $address_entity->save();
 
         // Stores entity result
-        $this->save_result($address_entity);
+        $this->store_result($address_entity);
 
         // Updates the instance
-        parent::_set();
+        $this->_set();
     }
 
 }

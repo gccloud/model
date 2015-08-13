@@ -118,7 +118,7 @@ class MY_Model extends CI_Model {
      * Stores entity query for futur object remap
      * @param mixed
      */
-    protected function save_result($data = array()) {
+    protected function store_result($data = array()) {
         if( ! is_array($data)) {
             $data = array($data);
         }
@@ -134,7 +134,7 @@ class MY_Model extends CI_Model {
      * Stores entity query for futur object remap
      * @param mixed
      */
-    protected function save_result_list($data = array()) {
+    protected function store_result_list($data = array()) {
         $temp = array();
 
         if( ! is_array($data)) {
