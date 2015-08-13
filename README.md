@@ -11,3 +11,16 @@ CodeIgniter 3 Model extension, working with maltyxx Origami package (see https:/
 #### Run composer
 ```shell
 composer require gccloud/model
+```
+#### Or edit /composer.json
+```json
+{
+    "require":
+    {
+        "gccloud/model": "1.0.*"
+    }
+}
+#### Run composer update
+```shell
+composer update
+```
