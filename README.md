@@ -20,6 +20,7 @@ composer require gccloud/model
         "gccloud/model": "1.0.*"
     }
 }
+```
 #### Run composer update
 ```shell
 composer update
