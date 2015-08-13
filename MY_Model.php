@@ -65,7 +65,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * __get magic
+     * __set magic
      * @param  mixed
      */
     public function __set($key, $value) {
@@ -182,32 +182,37 @@ class MY_Model extends CI_Model {
      * [set description]
      */
     protected function _set() {
-        $this->_remap_row();
+        $this->_remap_row(FALSE);
     }
 
     /**
      * [set_list description]
      */
     protected function _set_list() {
-        $this->_remap_list();
+        $this->_remap_list(FALSE);
     }
 
     /**
      * Fetches back all entities datas and sets model's corresponding attributes
      * @return object
      */
-    private function _remap_row() {
+    private function _remap_row($new_instance = TRUE) {
         if( ! empty($this->_db_result)) {
             foreach($this->_db_result as $d) {
                 $this->_remap($d);
             }
         }
 
-        $return = clone $this;
-        $return->_db_result = NULL;
+        if($new_instance) {
+            $return = clone $this;
+            $return->_db_result = NULL;
 
-        $this->_clear();
-        return $return;
+            $this->_clear();
+            return $return;
+        }
+        else {
+            $this->_db_result = NULL;
+        }
     }
 
     /**
@@ -222,8 +227,8 @@ class MY_Model extends CI_Model {
                 $new_instance = new static();
                 $new_instance->_remap($d);
                 $new_instance->_db_result = NULL;
+                $return[] = $new_instance;
             }
-            $return[] = $new_instance;
         }
 
         $this->_clear();

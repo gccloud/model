@@ -7,8 +7,14 @@ class Usergroup_model extends MY_Model {
     protected $id = 'mymodelexample.enumusergroup.id';
     protected $label = 'mymodelexample.enumusergroup.label';
 
+    // Class Constructor
+    public function __construct() {
+        parent::__construct();
+    }
+
     /**
-    * [Manager method] : Returns a new Usergroup instance
+    * [Manager method] : Returns a Usergroup instance
+    * @return \Usergroup_model
     */
     public function get($usergroup_id) {
         // Get back informations from the entity
@@ -22,11 +28,15 @@ class Usergroup_model extends MY_Model {
     }
 
     /**
-    * [Manager method] : Returns a new list of Usergroup instance
+    * [Manager method] : Returns a list of Usergroup instance
+    * @return array
     */
     public function get_list() {
+        // Loads the entity
+        $usergroup_entity = new \Entity\mymodelexample\enumusergroup();
+
         // Gets back informations
-        $usergroup_list = $user_entity::order_by('id', 'ASC')
+        $usergroup_list = $usergroup_entity::order_by('id', 'ASC')
             ->find();
 
         // Stores entity result

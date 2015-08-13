@@ -8,7 +8,7 @@ class User_model extends MY_Model {
     protected $lastname = 'mymodelexample.user.lastname';
     protected $firstname = 'mymodelexample.user.firstname';
     protected $address_id = 'mymodelexample.user.address_id';
-    protected $group_id = 'mymodelexample.user.usergroup_id';
+    protected $group_id = 'mymodelexample.user.enumusergroup_id';
     // Other model dependencies
     public $address;
     public $group;
@@ -22,15 +22,19 @@ class User_model extends MY_Model {
     }
 
     /**
-    * [Manager method] : Returns a new list of User instance
+    * [Manager method] : Creates a new User instance
     */
     public function insert($data = array()) {
-        // Loads the entities
+        // Loads the entity
         $user_entity = new \Entity\mymodelexample\user();
 
         // Adds new informations that must be saved
         $user_entity->lastname = $data['lastname'];
         $user_entity->firstname = $data['firstname'];
+        $user_entity->enumusergroup_id = $data['group_id'];
+        $user_entity->dateinsert = date('Y-m-d H:i:s');
+        $user_entity->dateupdate = date('Y-m-d H:i:s');
+
         // Saves it
         $user_entity->save();
 
@@ -38,23 +42,12 @@ class User_model extends MY_Model {
         $this->save_result($user_entity);
 
         // Remaps entities results and creates a new instance
-        $user = parent::_get(); 
-
-        // Calls other models attached to this one
-        $user->add_address(array(
-            'street' => $data['street'],
-            'city' => $data['city'],
-            'country' => $data['country']
-        ));
-        $user->add_group(array(
-            'group' => $data['group']
-        ));
-
-        return $user;
+        return parent::_insert(); 
     }
 
     /**
-    * [Manager method] : Returns a new User instance
+    * [Manager method] : Returns a User instance
+    * @return \User_model
     */
     public function get($user_id) {
         // Gets back informations from the entity
@@ -75,7 +68,8 @@ class User_model extends MY_Model {
     }
 
     /**
-    * [Manager method] : Returns a new list of User instance
+    * [Manager method] : Returns a list of User instance
+    * @return array
     */
     public function get_list_v1() {
         /* VERSION 1 : returns User datas only */
@@ -95,7 +89,8 @@ class User_model extends MY_Model {
     }
 
     /**
-    * [Manager method] : Returns a new list of User instance
+    * [Manager method] : Returns a list of User instance
+    * @return array
     */
     public function get_list_v2() {
         /* VERSION 2 : returns User datas, completed with their Address and Usergroup datas */
@@ -130,21 +125,57 @@ class User_model extends MY_Model {
     }
 
     /**
+    * [Instance method] : Updates current User informations
+    */
+    public function set($data = array()) {
+        // Loads the entity
+        $user_entity = new \Entity\mymodelexample\user($this->id);
+
+        // Sets entity informations
+        foreach($data as $key => $value) {
+            $user_entity->$key = $value;
+        }
+        $user_entity->dateupdate = date('Y-m-d H:i:s');
+        // Saves them
+        $user_entity->save();
+
+        // Stores entity result
+        $this->save_result($user_entity);
+
+        // Updates the instance
+        parent::_set();
+    }
+
+    /**
     * [Instance method] : Adds an Address instance for current User
+    * @return \Address_model
     */
     public function add_address($data = array()) {
         $this->address = $this->address_model->insert($data);
+        $this->set(array(
+            'address_id' => $this->address->id
+        ));
     }
 
     /**
     * [Instance method] : Returns an Address instance for current User
+    * @return \Address_model
     */
     public function get_address() {
         $this->address = $this->address_model->get($this->address_id);
     }
 
     /**
-    * [Instance method] : Returns a Usergroup instance for current User
+    * [Instance method] : Updates the Address instance for current User
+    * @return \Address_model
+    */
+    public function set_address($data) {
+        $this->address->set($data);
+    }
+
+    /**
+    * [Instance method] : Returns a Usergroup instance for the current User
+    * @return \Usergroup_model
     */
     public function get_group() {
         $this->group = $this->usergroup_model->get($this->group_id);
