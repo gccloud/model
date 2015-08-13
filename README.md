@@ -1,5 +1,5 @@
 # CodeIgniter Model
-CodeIgniter 3 Model extension using maltyyx/origami package
+CodeIgniter 3 Model extension, working with maltyxx Origami package (see https://github.com/maltyxx/origami)
 
 ## Requirements
 
