@@ -69,7 +69,7 @@ class MY_Model extends CI_Model {
      * @param  mixed
      */
     public function __set($key, $value) {
-        if(isset($this->$key)) {
+        if(property_exists($this, $key)) {
             $this->$key = $value;
         }
         else {
