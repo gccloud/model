@@ -21,7 +21,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage  Libraries
  * @category    Libraries
  * @author      Gregory Carrodano
- * @version     20150710
+ * @version     20150902
  */
 class MY_Model extends CI_Model {
     private $_map = array();
@@ -50,6 +50,7 @@ class MY_Model extends CI_Model {
     /**
      * __get magic
      * @param  mixed
+     * @return mixed
      */
     public function __get($key) {
         if(in_array($key, $this->_map) || isset($this->$key)) {
@@ -61,7 +62,8 @@ class MY_Model extends CI_Model {
         elseif(in_array($key, $this->_models)) {
             return parent::__get($key);
         }
-        show_error('Undefined property : '.get_class($this).'::'.$key);
+        $debug = debug_backtrace();
+        show_error('Cannot access undefined property \''.$key.'\' of class '.get_class($this).'.<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[1]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
     }
 
     /**
@@ -73,7 +75,8 @@ class MY_Model extends CI_Model {
             $this->$key = $value;
         }
         else {
-            show_error('Unable to access property : '.get_class($this).'::'.$key);
+            $debug = debug_backtrace();
+            show_error('Cannot modify undefined property \''.$key.'\' of class '.get_class($this).'.<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[1]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
         }
     }
 
@@ -89,7 +92,10 @@ class MY_Model extends CI_Model {
         if( ! empty($data)) {
             foreach ($data as $d) {
                 $class = explode('\\', $d);
-                (count($class) === 4) OR show_error('Invalid Entity declaration : '.$d);
+                if(count($class) !== 4) {
+                    $debug = debug_backtrace();
+                    show_error('Invalid Entity declaration, unexpected \''.$d.'\'<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[0]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
+                }
                 $entity_key = $class[2].'_'.$class[3];
                 $this->_entities[$entity_key] = $d;
             }
@@ -107,7 +113,10 @@ class MY_Model extends CI_Model {
 
         if( ! empty($data)) {
             foreach ($data as $d) {
-                (strpos($d, '_model') !== FALSE) OR show_error('Invalid Model declaration : '.$d);
+                if(strpos($d, '_model') === FALSE) {
+                    $debug = debug_backtrace();
+                    show_error('Invalid Model declaration, unexpected \''.$d.'\'<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[0]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
+                }
                 $this->_models[] = $d;
             }
             get_instance()->load->model($this->_models);
@@ -115,7 +124,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * Stores entity query for futur object remap
+     * Stores entity query for future object remap
      * @param mixed
      */
     protected function store_result($data = array()) {
@@ -131,7 +140,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * Stores entity query for futur object remap
+     * Stores entity query for future object remap
      * @param mixed
      */
     protected function store_result_list($data = array()) {
@@ -147,7 +156,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * [get description]
+     * Returns a new Model instance
      * @return object
      */
     protected function _get() {
@@ -155,7 +164,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * [get_list description]
+     * Returns an array of new Model instances
      * @return array
      */
     protected function _get_list() {
@@ -163,37 +172,37 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * [insert description]
+     * Alias of _get()
      * @return object
      */
     protected function _insert() {
-        return $this->_remap_row();
+        return $this->_get();
     }
 
     /**
-     * [insert_list description]
+     * Alias of _get_list()
      * @return array
      */
     protected function _insert_list() {
-        return $this->_remap_list();
+        return $this->_get_list();
     }
 
     /**
-     * [set description]
+     * Updates a Model instance
      */
     protected function _set() {
         $this->_remap_row(FALSE);
     }
 
     /**
-     * [set_list description]
+     * Updates an array of Model instances
      */
     protected function _set_list() {
         $this->_remap_list(FALSE);
     }
 
     /**
-     * Fetches back all entities datas and sets model's corresponding attributes
+     * Fetches back all entities datas and sets Model's corresponding attributes
      * @return object
      */
     private function _remap_row($new_instance = TRUE) {
@@ -216,7 +225,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * Fetches back all entities datas and sets model's corresponding attributes
+     * Fetches back all entities datas and sets Model's corresponding attributes
      * @return array
      */
     private function _remap_list() {
@@ -235,6 +244,10 @@ class MY_Model extends CI_Model {
         return $return;
     }
 
+    /**
+     * Remap processing function
+     * @param  object
+     */
     private function _remap($line) {
         if( ! empty($line)) {
             $map = $this->_map;
@@ -253,6 +266,9 @@ class MY_Model extends CI_Model {
         }
     }
 
+    /**
+     * Clears all entities results (called right before returning a newly created instance)
+     */
     private function _clear() {
         $this->_db_result = NULL;
 
