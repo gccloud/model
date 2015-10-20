@@ -202,6 +202,33 @@ class MY_Model extends CI_Model {
     }
 
     /**
+     * [_debug description]
+     */
+    public function debug() {
+        $CI =& get_instance();
+        $CI->load->dbutil();
+
+        $map = $this->_map;
+        foreach($map as $key => $value) {
+            $parts = explode('.', $key);
+            if( ! $CI->dbutil->database_exists($parts[1])) {
+                $debug = debug_backtrace();
+                show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[1].' is not a valid database name.<br /><br /><b>Filename :</b> '.get_class($debug[0]['object']));
+            }
+            if( ! $CI->db->table_exists($parts[2])) {
+                $debug = debug_backtrace();
+                show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[2].' is not a valid table name.<br /><br /><b>Filename :</b> '.get_class($debug[0]['object']));
+            }
+            if( ! $CI->db->field_exists($parts[3], $parts[2])) {
+                $debug = debug_backtrace();
+                show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[3].' is not a valid field name.<br /><br /><b>Filename :</b> '.get_class($debug[0]['object']));
+            }
+        }
+
+        return TRUE;
+    }
+
+    /**
      * Fetches back all entities datas and sets Model's corresponding attributes
      * @return object
      */
