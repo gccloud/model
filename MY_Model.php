@@ -205,6 +205,8 @@ class MY_Model extends CI_Model {
      */
     public function debug() {
         $CI =& get_instance();
+
+        $CI->load->database();
         $CI->load->dbutil();
 
         $map = $this->_map;
