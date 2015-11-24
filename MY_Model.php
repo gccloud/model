@@ -21,16 +21,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage  Libraries
  * @category    Libraries
  * @author      Gregory Carrodano
- * @version     20150902
+ * @version     20151124
  */
 class MY_Model extends CI_Model {
     private $_map = array();
-    private $_entities = array();
     private $_models = array();
     private $_db_result = NULL;
 
+    /* CORE FUNCTIONS */
+
     /**
      * Class constructor
+     * @method __construct
      */
     public function __construct() {
         parent::__construct();
@@ -49,61 +51,49 @@ class MY_Model extends CI_Model {
 
     /**
      * __get magic
+     * @method __get
      * @param  mixed
      * @return mixed
      */
     public function __get($key) {
-        if(in_array($key, $this->_map) || isset($this->$key)) {
-            return $this->$key;
+        // This method should only be called when trying to access another Model, so this is the only verification we'll do here.
+        // First, we have to check if we're trying to retrieve the models attached to the Manager
+        if($key === '_models') {
+            return $key;
         }
-        elseif(array_key_exists($key, $this->_entities)) {
-            return $this->_entities[$key];
+        // Then, we have to check if we're trying to acces another model from an instance (and therefore, take it back from the corresponding Manager)
+        else {
+            $manager = get_instance()->{strtolower(get_class($this))};
+            if(in_array($key, $manager->_models)) {
+                return parent::__get($key);
+            }
         }
-        elseif(in_array($key, $this->_models)) {
-            return parent::__get($key);
-        }
+
         $debug = debug_backtrace();
         show_error('Cannot access undefined property \''.$key.'\' of class '.get_class($this).'.<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[1]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
     }
 
     /**
      * __set magic
+     * @method __set
      * @param  mixed
      */
     public function __set($key, $value) {
         if(property_exists($this, $key)) {
             $this->$key = $value;
         }
+
         else {
             $debug = debug_backtrace();
             show_error('Cannot modify undefined property \''.$key.'\' of class '.get_class($this).'.<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[1]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
         }
     }
 
-    /**
-     * ORigaMi Entities dependencies declaration
-     * @param  array
-     */
-    protected function add_entities($data = array()) {
-        if( ! is_array($data)) {
-            $data = array($data);
-        }
-
-        if( ! empty($data)) {
-            foreach ($data as $d) {
-                $class = explode('\\', $d);
-                if(count($class) !== 4) {
-                    $debug = debug_backtrace();
-                    show_error('Invalid Entity declaration, unexpected \''.$d.'\'<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[0]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
-                }
-                $entity_key = $class[2].'_'.$class[3];
-                $this->_entities[$entity_key] = $d;
-            }
-        }
-    }
+    /* MAIN METHODS */
 
     /**
      * Other CI Models dependencies declaration
+     * @method add_models
      * @param array
      */
     protected function add_models($data = array()) {
@@ -125,6 +115,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Stores entity query for future object remap
+     * @method store_result
      * @param mixed
      */
     protected function store_result($data = array()) {
@@ -141,6 +132,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Stores entity query for future object remap
+     * @method store_result_list
      * @param mixed
      */
     protected function store_result_list($data = array()) {
@@ -157,6 +149,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Returns a new Model instance
+     * @method _get
      * @return object
      */
     protected function _get() {
@@ -165,6 +158,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Returns an array of new Model instances
+     * @method _get_list
      * @return array
      */
     protected function _get_list() {
@@ -173,6 +167,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Alias of _get()
+     * @method _insert
      * @return object
      */
     protected function _insert() {
@@ -181,6 +176,7 @@ class MY_Model extends CI_Model {
 
     /**
      * Alias of _get_list()
+     * @method _insert_list
      * @return array
      */
     protected function _insert_list() {
@@ -189,20 +185,23 @@ class MY_Model extends CI_Model {
 
     /**
      * Updates a Model instance
+     * @method _set
      */
     protected function _set() {
-        $this->_remap_row(FALSE);
+        $this->_remap_row();
     }
 
     /**
      * Updates an array of Model instances
+     * @method _set_list
      */
     protected function _set_list() {
         $this->_remap_list(FALSE);
     }
 
     /**
-     * [_debug description]
+     * Utility method : checks the Model map, in order to to track incorrect database, tables or field names
+     * @method _debug
      */
     public function debug() {
         $CI =& get_instance();
@@ -228,31 +227,30 @@ class MY_Model extends CI_Model {
         return TRUE;
     }
 
+    /* INTERNAL METHODS */
+
     /**
      * Fetches back all entities datas and sets Model's corresponding attributes
+     * @method _remap_row
      * @return object
      */
-    private function _remap_row($new_instance = TRUE) {
+    private function _remap_row() {
         if( ! empty($this->_db_result)) {
             foreach($this->_db_result as $d) {
-                $this->_remap($d);
+                $this->_do_remap($d);
             }
         }
 
-        if($new_instance) {
-            $return = clone $this;
-            $return->_db_result = NULL;
+        $return = clone $this;
+        $return->_clear();
 
-            $this->_clear();
-            return $return;
-        }
-        else {
-            $this->_db_result = NULL;
-        }
+        $this->_reset();
+        return $return;
     }
 
     /**
      * Fetches back all entities datas and sets Model's corresponding attributes
+     * @method _remap_list
      * @return array
      */
     private function _remap_list() {
@@ -261,21 +259,24 @@ class MY_Model extends CI_Model {
         if( ! empty($this->_db_result)) {
             foreach($this->_db_result as $d) {
                 $new_instance = new static();
-                $new_instance->_remap($d);
-                $new_instance->_db_result = NULL;
+
+                $new_instance->_do_remap($d);
+                $new_instance->_clear();
+
                 $return[] = $new_instance;
             }
         }
 
-        $this->_clear();
+        $this->_reset();
         return $return;
     }
 
     /**
      * Remap processing function
+     * @method _do_remap
      * @param  object
      */
-    private function _remap($line) {
+    private function _do_remap($line) {
         if( ! empty($line)) {
             $map = $this->_map;
 
@@ -294,9 +295,18 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * Clears all entities results (called right before returning a newly created instance)
+     * Utility function (internal use only) : clears all entities results (called right before returning a newly created instance). Actually, this is only called for the base class loaded inside CI, the one acting as a "Manager".
+     * @method _clear
      */
     private function _clear() {
+        unset($this->_db_result, $this->_map, $this->_models);
+    }
+
+    /**
+     * Utility function (internal use only) : clears all private variables (called right before returning a newly created instance).
+     * @method _reset
+     */
+    private function _reset() {
         $this->_db_result = NULL;
 
         $map = $this->_map;
