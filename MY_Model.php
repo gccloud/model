@@ -56,9 +56,9 @@ class MY_Model extends CI_Model {
      * @return mixed
      */
     public function __get($key) {
-        // This method should only be called when trying to access another Model, so this is the only verification we'll do here.
-        // First, we have to check if we're trying to retrieve the models attached to the Manager
-        if($key === '_models') {
+        // This method should be called when trying to access another Model, or to store results on an existing instance; so these are the only verifications we'll do here.
+        // First, we have to check if we're trying to retrieve some attributes attached to the Manager only
+        if(in_array($key, array('_models', '_map'))) {
             return $key;
         }
         // Then, we have to check if we're trying to acces another model from an instance (and therefore, take it back from the corresponding Manager)
@@ -79,10 +79,12 @@ class MY_Model extends CI_Model {
      * @param  mixed
      */
     public function __set($key, $value) {
-        if(property_exists($this, $key)) {
+        if($key === '_db_result') {
+            $this->_db_result = $value;
+        }
+        else if(property_exists($this, $key)) {
             $this->$key = $value;
         }
-
         else {
             $debug = debug_backtrace();
             show_error('Cannot modify undefined property \''.$key.'\' of class '.get_class($this).'.<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[1]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
@@ -123,6 +125,10 @@ class MY_Model extends CI_Model {
             $data = array($data);
         }
 
+        if( ! isset($this->_db_result)) {
+            $this->_db_result = NULL;
+        }
+
         if( ! empty($data)) {
             foreach($data as $d) {
                 $this->_db_result[] = $d;
@@ -140,6 +146,10 @@ class MY_Model extends CI_Model {
 
         if( ! is_array($data)) {
             $data = array($data);
+        }
+
+        if( ! isset($this->_db_result)) {
+            $this->_db_result = NULL;
         }
 
         if( ! empty($data)) {
@@ -280,7 +290,8 @@ class MY_Model extends CI_Model {
      */
     private function _do_remap($line) {
         if( ! empty($line)) {
-            $map = $this->_map;
+            // $map = $this->_map;
+            $map = get_instance()->{strtolower(get_class($this))}->_map;
 
             $db_table = str_replace('\\', '.', get_class($line));
             $db_keys = $line->get();
@@ -312,8 +323,11 @@ class MY_Model extends CI_Model {
         $this->_db_result = NULL;
 
         $map = $this->_map;
-        foreach($map as $m) {
-            $this->$m = NULL;
+
+        if(is_array($map)) {
+            foreach($map as $m) {
+                $this->$m = NULL;
+            }
         }
     }
 
