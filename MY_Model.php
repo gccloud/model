@@ -332,7 +332,7 @@ class MY_Model extends CI_Model {
     }
 
     /**
-     * method to_array renvoi un tableau 1 dimension des infos
+     * method to_array create a single dimensional array from the data
      */
     public function to_array() {
         foreach($this as $key=>$value) {
