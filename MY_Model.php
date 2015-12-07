@@ -331,6 +331,36 @@ class MY_Model extends CI_Model {
         }
     }
 
+    /**
+     * method to_array create a single dimensional array from the data
+     */
+    public function to_array() {
+        foreach($this as $key=>$value) {
+            if(!is_object($value)) {
+                if($value !== null) {
+                    $return[$key] = $value;
+                }
+            } else {
+                if(method_exists($value, 'to_array')) {
+                    $child = $value->to_array();
+                    foreach ($child as $child_key => $child_value) {
+                        $name = explode('model', get_class($value))[0].$child_key;
+                        $name = mb_strtolower($name);
+                        if (isset($return[$child_key])) {
+                            $child_key = $name;
+                        }
+                        if(!isset($return[$child_key])) {
+                            $return[$child_key] = $child_value;
+                        }
+                    }
+                } else {
+                    $return[$key] = $value;
+                }
+            }
+        }
+        return $return;
+    }
+
 }
 
 
