@@ -1,5 +1,8 @@
 <?php
 
+require_once(__DIR__.'/Manager/ModelManager.php');
+require_once(__DIR__.'/Utility/ModelHelper.php');
+
 /**
  * CodeIgniter
  *
@@ -16,38 +19,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * CodeIgniter Model Class : standard CI_Model Class override, which allows to design DB "Manager" classes
- * SIDENOTE : Though not mandatory, theses "Managers" are designed to work paired with Maltyxx's Origami package (see https://github.com/maltyxx/origami for further explainations)
+ * SIDENOTE : Though not mandatory, theses Models are designed to work paired with Maltyxx's Origami package (see https://github.com/maltyxx/origami for further explainations)
  *
  * @class       MY_Model
  * @package     CodeIgniter
  * @subpackage  Core
  * @category    Core
  * @author      Gregory CARRODANO
- * @version     20151208
+ * @version     20151221
  */
 class MY_Model extends CI_Model
 {
-    /* CLASS ATTRIBUTES */
-
-    /**
-     * DB result storage. Actually, this array will serve to temporarlly store Origami Entities before mapping it to a new model Instance.
-     * @var array
-     * @public
-     */
-    public $mngr_db_result = NULL;
-    /**
-     * Model <-> Entities attributes (datas) auto-remap. That's the core of our Manager task : each time a new Instance is created, we loop through the map to assign each stored Entity data to the corresponding model Attribute
-     * @var array
-     * @public
-     */
-    public $mngr_map = array();
-    /**
-     * Other models dependencies storage. This will allow to control which model can be accessed by another one (thus defining a proper "hierarchy" among all of the application's models)
-     * @var array
-     * @public
-     */
-    public $mngr_models = array();
-
     /* CORE FUNCTIONS */
 
     /**
@@ -59,13 +41,15 @@ class MY_Model extends CI_Model
     {
         parent::__construct();
 
-        $datas = get_object_vars($this);
+        if(get_class($this) !== 'MY_Model') {
+            $datas = get_object_vars($this);
 
-        if ( ! empty($datas)) {
-            foreach ($datas as $key => $value) {
-                if ( ! empty($value)) {
-                    $this->mngr_map['Entity.'.$value] = $key;
-                    $this->$key = NULL;
+            if ( ! empty($datas)) {
+                foreach ($datas as $key => $value) {
+                    if ( ! empty($value)) {
+                        Manager()->stack_map(get_class($this), 'Entity.'.$value, $key);
+                        $this->$key = NULL;
+                    }
                 }
             }
         }
@@ -80,8 +64,8 @@ class MY_Model extends CI_Model
      */
     public function __get($key)
     {
-        // This method should be called when trying to access another model, so that's the only verification we'll do here.
-        if (in_array($key, get_instance()->{strtolower(get_class($this))}->mngr_models)) {
+        // This method should ONLY be called when trying to access another model, so that's the only verification we'll do here.
+        if (in_array($key, Manager()->get_models(get_class($this)))) {
             return parent::__get($key);
         }
 
@@ -99,13 +83,9 @@ class MY_Model extends CI_Model
      */
     public function __set($key, $value)
     {
-        if (in_array($key, array('mngr_db_result', 'mngr_map'))) {
-            $this->$key = $value;
-        } else {
         // Since Models should always have explicit attributes declarations, dynamic attributes (i.e declaring and seting non-class attributes to Instances) should NEVER be declared. In case such declaration is processed, this function will be called, thus throwing an error
         $debug = debug_backtrace();
         show_error('Cannot modify undefined property "'.$key.'" of class '.get_class($this).'.<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[1]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
-        }
     }
 
     /* MAIN FUNCTIONS */
@@ -120,6 +100,8 @@ class MY_Model extends CI_Model
     {
         // First, we check if anything was actually passed to the function call
         if ( ! empty($data)) {
+            $new_models = array();
+
             // If so, we auto-convert the argument passed
             if ( ! is_array($data)) {
                 $data = array($data);
@@ -134,11 +116,12 @@ class MY_Model extends CI_Model
                     show_error('Invalid Model declaration, unexpected "'.$d.'"<br /><br /><b>Filename :</b> '.$debug[0]['file'].'<br /><b>Function :</b> '.$debug[0]['function'].'<br /><b>Line number :</b> '.$debug[0]['line']);
                 }
                 // Otherwise, the declared model is correct, so we'll pack it on the models list
-                $this->mngr_models[] = $d;
+                $new_models[] = $d;
+                Manager()->stack_model(get_class($this), $d);
             }
 
-            // Finally, we can load all previously packed models
-            get_instance()->load->model($this->mngr_models);
+            // Finally, we can load all previously packed models and store it in our Manager
+            CI()->load->model($new_models);
         }
     }
 
@@ -151,25 +134,23 @@ class MY_Model extends CI_Model
      */
     protected function store_result($data = array())
     {
-        // First, we check if anything was actually passed to the function call
+        // First, we've got to fetch back our Manager instance
+        $Manager = Manager();
+
+        // Then we check if anything was actually passed to the function call
         if ( ! empty($data)) {
             // If so, we auto-convert the argument passed
             if ( ! is_array($data)) {
                 $data = array($data);
             }
 
-            // Since DB results are removed each time a new Instance is returned by the corresponding Manager, we've got to dynamically recreate it (for Instances only)
-            // (SIDENOTE : i know i've said earlier that models' attributes should never be dynamically declared; but that's a very special case with one internal attribute that should never be seen outside of here - and hey, afterall, nobody's perfect ^^)
-            if ( ! isset($this->mngr_db_result)) {
-                $this->mngr_db_result = NULL;
-            }
-
-            // We can finally loop through our DB datas, and store it
+            // Now we can loop through our DB datas, and store it on the current Manager instance
             foreach ($data as $d) {
-                $this->mngr_db_result[] = $d;
+                $Manager->stack_db_result($d);
             }
         }
 
+        // And finally return the current instance itslef (allowing "CI's like" chaining method calls)
         return $this;
     }
 
@@ -182,22 +163,21 @@ class MY_Model extends CI_Model
      */
     protected function store_result_list($data = array())
     {
-        // First, we check if anything was actually passed to the function call
+        // First, we've got to fetch back our Manager instance
+        $Manager = Manager();
+
+        // Then we check if anything was actually passed to the function call
         if ( ! empty($data)) {
             // If so, we auto-convert the argument passed
             if ( ! is_array($data)) {
                 $data = array($data);
             }
 
-            // This is the same deal as in the previous function, so refer to it for further explainations
-            if ( ! isset($this->mngr_db_result)) {
-                $this->mngr_db_result = NULL;
-            }
-
-            // We can finally store our DB datas (no loop this time, that's a direct storing call)
-            $this->mngr_db_result = $data;
+            // Now we can store our DB datas (no loop this time, that's a direct storing call)
+            $Manager->stack_db_result($data);
         }
 
+        // And finally return the current instance itslef (allowing "CI's like" chaining method calls)
         return $this;
     }
 
@@ -209,7 +189,7 @@ class MY_Model extends CI_Model
      */
     protected function _get()
     {
-        return $this->_remap_row();
+        return $this->_remap_row(TRUE);
     }
 
     /**
@@ -231,7 +211,7 @@ class MY_Model extends CI_Model
      */
     protected function _insert()
     {
-        return $this->_get();
+        return $this->_get(TRUE);
     }
 
     /**
@@ -252,7 +232,7 @@ class MY_Model extends CI_Model
      */
     protected function _set()
     {
-        $this->_remap_row(TRUE);
+        $this->_remap_row();
     }
 
     /**
@@ -267,7 +247,7 @@ class MY_Model extends CI_Model
 
     /* UTILITY FUNCTIONS */
     /**
-     * Flattens a Model instance, returning it as an array of key/value pairs
+     * Flattens a Model instance, returning it as an array of key / value pairs
      * @method to_array
      * @public
      * @param  string
@@ -291,12 +271,12 @@ class MY_Model extends CI_Model
      */
     public function debug()
     {
-        $CI =& get_instance();
+        $CI = CI();
 
         $CI->load->database();
         $CI->load->dbutil();
 
-        $map = $this->mngr_map;
+        $map = Manager()->get_map(get_class($this));
         foreach ($map as $key => $value) {
             $parts = explode('.', $key);
             if ( ! $CI->dbutil->database_exists($parts[1])) {
@@ -327,19 +307,22 @@ class MY_Model extends CI_Model
      */
     private function _remap_row($new_instance = FALSE)
     {
-        if ( ! empty($this->mngr_db_result)) {
-            foreach ($this->mngr_db_result as $d) {
+        $return = NULL;
+
+        $db_result = Manager()->get_db_result();
+
+        if ( ! empty($db_result)) {
+            foreach ($db_result as $d) {
                 $this->_do_remap($d);
             }
         }
 
         if($new_instance) {
             $return = clone $this;
-            $return->_clear();
-
-            $this->_reset();
-            return $return;
         }
+
+        $this->_reset();
+        return $return;
     }
 
     /**
@@ -352,14 +335,13 @@ class MY_Model extends CI_Model
     {
         $return = array();
 
-        if ( ! empty($this->mngr_db_result)) {
-            foreach ($this->mngr_db_result as $d) {
-                $new_instance = new static();
+        $db_result = Manager()->get_db_result();
 
-                $new_instance->_do_remap($d);
-                $new_instance->_clear();
+        if ( ! empty($db_result)) {
+            foreach ($db_result as $d) {
+                $instance = new static();
 
-                $return[] = $new_instance;
+                $return[] = $instance->_do_remap($d);
             }
         }
 
@@ -376,8 +358,7 @@ class MY_Model extends CI_Model
     private function _do_remap($line)
     {
         if ( ! empty($line)) {
-            $map = get_instance()->{strtolower(get_class($this))}->mngr_map;
-
+            $map = Manager()->get_map(get_class($this));
             $db_table = str_replace('\\', '.', get_class($line));
             $db_keys = $line->get();
 
@@ -393,24 +374,16 @@ class MY_Model extends CI_Model
     }
 
     /**
-     * Utility function (internal use only) : clears all entities results (called right before returning a newly created instance). Actually, this is only called for the base class loaded inside CI, the one acting as a "Manager".
-     * @method _clear
-     * @private
-     */
-    private function _clear() {
-        unset($this->mngr_db_result, $this->mngr_map, $this->mngr_models);
-    }
-
-    /**
-     * Utility function (internal use only) : clears all private variables (called right before returning a newly created instance).
+     * Utility function (internal use only) : clears Model / Manager variables (called right before returning a newly created instance).
      * @method _reset
      * @private
      */
     private function _reset()
     {
-        $this->mngr_db_result = NULL;
+        $Manager = Manager();
 
-        $map = $this->mngr_map;
+        $Manager->reset_db_result();
+        $map = $Manager->get_map(get_class($this));
 
         if (is_array($map)) {
             foreach ($map as $m) {
