@@ -1,23 +1,34 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Address_model extends MY_Model {
+class Address_model extends MY_Model
+{
+    /* CLASS ATTRIBUTES */
 
-    // Model attributes
-    protected $id = 'mymodelexample.address.id';
-    protected $label = 'mymodelexample.address.label';
-    protected $zipcode = 'mymodelexample.city.zipcode';
-    protected $city = 'mymodelexample.city.label';
-    protected $country = 'mymodelexample.country.label';
-    protected $country_iso = 'mymodelexample.country.iso';
+    public $id = 'mymodelexample.address.id';
+    public $label = 'mymodelexample.address.label';
+    public $zipcode = 'mymodelexample.city.zipcode';
+    public $city = 'mymodelexample.city.label';
+    public $country = 'mymodelexample.country.label';
+    public $country_iso = 'mymodelexample.country.iso';
 
-    // Class Constructor
+    /* CORE FUNCTIONS */
+
+    /**
+     * Class Constructor
+     * @method __construct
+     * @public
+     */
     public function __construct() {
         parent::__construct();
     }
 
+    /* PUBLIC FUNCTIONS */
+
     /**
     * [Manager method] : Returns a new Address instance
+    * @method insert
+    * @public
     */
     public function insert($data = array()) {
         // Loads the entity
@@ -82,11 +93,9 @@ class Address_model extends MY_Model {
         $city_entity = $address_entity->city()->find_one();
         $country_entity = $city_entity->country()->find_one();
 
-        // Stores entity result
-        $this->store_result(array($address_entity, $city_entity, $country_entity));
-
-        // Remaps entities results and returns a new instance
-        return $this->_get();
+        // Stores entity result, remaps it, and returns a new instance
+        return $this->store_result(array($address_entity, $city_entity, $country_entity))
+            ->_get();
     }
 
     /**
@@ -104,11 +113,9 @@ class Address_model extends MY_Model {
         // Saves them
         $address_entity->save();
 
-        // Stores entity result
-        $this->store_result($address_entity);
-
-        // Updates the instance
-        $this->_set();
+        // Stores entity result, and updates the instance
+        $this->store_result($address_entity)
+            ->_set();
     }
 
 }

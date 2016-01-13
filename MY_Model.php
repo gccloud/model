@@ -41,7 +41,7 @@ class MY_Model extends CI_Model
     {
         parent::__construct();
 
-        if(get_class($this) !== 'MY_Model') {
+        if (get_class($this) !== 'MY_Model') {
             $datas = get_object_vars($this);
 
             if ( ! empty($datas)) {
@@ -317,7 +317,7 @@ class MY_Model extends CI_Model
             }
         }
 
-        if($new_instance) {
+        if ($new_instance) {
             $return = clone $this;
         }
 

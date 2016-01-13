@@ -1,49 +1,80 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Usergroup_model extends MY_Model {
+class Usergroup_model extends MY_Model
+{
+    /* CLASS ATTRIBUTES */
 
-    // Model attributes
-    protected $id = 'mymodelexample.enumusergroup.id';
-    protected $label = 'mymodelexample.enumusergroup.label';
+    public $id = 'mymodelexample.enumusergroup.id';
+    public $label = 'mymodelexample.enumusergroup.label';
 
-    // Class Constructor
-    public function __construct() {
+    /* CORE FUNCTIONS */
+
+    /**
+     * Class Constructor
+     * @method __construct
+     * @public
+     */
+    public function __construct()
+    {
         parent::__construct();
     }
 
+    /* PUBLIC FUNCTIONS */
+
     /**
-    * [Manager method] : Returns a Usergroup instance
+    * [Manager method] : Returns a new Usergroup instance
+    * @method get
+    * @public
     * @return \Usergroup_model
     */
-    public function get($usergroup_id) {
-        // Get back informations from the entity
-        $usergroup_entity = new \Entity\mymodelexample\enumusergroup($usergroup_id);
-
-        // Stores entity result
-        $this->store_result($usergroup_entity);
-
-        // Remaps entities results and returns a new instance
-        return $this->_get();
+    public function get($usergroup_id)
+    {
+        // Gets back informations from the entity, stores result, remaps it, and returns a new instance
+        return $this->store_result(new \Entity\mymodelexample\enumusergroup($usergroup_id))
+            ->_get();
+        /*
+            ************************************
+            *   Details (unfactorized calls)   *
+            ************************************
+            * First, gets back informations from the entity
+                $entity = new \Entity\mymodelexample\enumusergroup($usergroup_id);
+            * Then stores the entity result
+                $this->store_result($entity);
+            * Remaps it, creating a new instance
+                $new_instance = $this->_get();
+            * Finally returns that instance
+                return $new_instance;
+            ************************************
+        */
     }
 
     /**
-    * [Manager method] : Returns a list of Usergroup instance
+    * [Manager method] : Returns a new list of Usergroup instance
+    * @method get_list
+    * @public
     * @return array
     */
-    public function get_list() {
-        // Loads the entity
-        $usergroup_entity = new \Entity\mymodelexample\enumusergroup();
-
-        // Gets back informations
-        $usergroup_list = $usergroup_entity::order_by('id', 'ASC')
-            ->find();
-
-        // Stores entity result
-        $this->store_result_list($usergroup_list);
-
-        // Remaps entities results and returns a new instance
-        return $this->_get_list();
+    public function get_list()
+    {
+        // Gets back informations from the entity, stores result, and returns a new instance list
+        return $this->store_result_list(\Entity\mymodelexample\enumusergroup::order_by('id', 'ASC')
+                ->find())
+            ->_get_list();
+        /*
+            ************************************
+            *   Details (unfactorized calls)   *
+            ************************************
+            * First, gets back informations from the entity
+                $entity_list = \Entity\mymodelexample\enumusergroup::order_by('id', 'ASC')->find();
+            * Then stores the entity result
+                $this->store_result_list($entity_list);
+            * Remaps it, creating a list of new instance
+                $result_list = $this->_get_list();
+            * Finally returns that list
+                return $result_list;
+            ************************************
+        */
     }
 
 }

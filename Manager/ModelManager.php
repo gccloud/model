@@ -35,13 +35,13 @@ final class ModelManager
     private $db_result = NULL;
     /**
      * Model <-> Entities attributes (datas) auto-remap. That's the core of our Manager task : each time a new Model Instance is created, we loop through that Model map to assign each stored Entity data to the corresponding Model attribute
-     * @var ModelData
+     * @var array
      * @private
      */
     private $map = array();
     /**
      * Other models dependencies storage. This will allow to control which model can be accessed by another one (thus defining a proper "hierarchy" among all of the application's models)
-     * @var ModelData
+     * @var array
      * @private
      */
     private $models = array();
@@ -81,8 +81,6 @@ final class ModelManager
         }
 
         static::$_instance = new static();
-        // static::$_instance->map = new ModelData();
-        // static::$_instance->models = new ModelData();
 
         return static::$_instance;
     }
@@ -181,7 +179,7 @@ final class ModelManager
      */
     private function _stack_data(&$prop, $model, $value, $key = NULL)
     {
-        if( ! is_null($key)) {
+        if ( ! is_null($key)) {
             $prop[$model][$key] = $value;
         } else {
             $prop[$model][] = $value;
