@@ -16,7 +16,7 @@ composer require gccloud/parser
 {
     "require":
     {
-        "gccloud/parser": "1.1.*"
+        "gccloud/model": "1.1.*"
     }
 }
 ```
