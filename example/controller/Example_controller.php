@@ -1,9 +1,19 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Example_controller extends CI_Controller {
-
-    public function __construct() {
+/**
+ *
+ *
+ * @class       Example_controller
+ * @package     CodeIgniter
+ * @category    Controller
+ * @author      Gregory CARRODANO <g.carrodano@gmail.com>
+ * @version     20160119
+ */
+class Example_controller extends CI_Controller
+{
+    public function __construct()
+    {
         parent::__construct();
 
         $this->load->driver('cache');
@@ -13,10 +23,10 @@ class Example_controller extends CI_Controller {
         $this->load->add_package_path(APPPATH.'third_party/origami');
         $this->load->library('origami');
         $this->load->remove_package_path(APPPATH.'third_party/origami');
-
     }
 
-    public function index() {
+    public function index()
+    {
         // Loads a model
         $this->load->model('user_model');
 

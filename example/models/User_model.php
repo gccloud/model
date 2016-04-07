@@ -104,6 +104,7 @@ class User_model extends MY_Model
 
         // Declares an array to store the instance list
         $user_list = array();
+
         // Loops on every entity result
         foreach($entity_result as $entity) {
             // Stores result, remaps it, creates a new instance, calls other models attached to this one, and adds the fully prepared instance it to the result list
@@ -130,6 +131,7 @@ class User_model extends MY_Model
             $user_entity->$key = $value;
         }
         $user_entity->dateupdate = date('Y-m-d H:i:s');
+
         // Saves them
         $user_entity->save();
 
@@ -145,6 +147,7 @@ class User_model extends MY_Model
     public function add_address($data = array())
     {
         $this->address = $this->address_model->insert($data);
+
         $this->set(array(
             'address_id' => $this->address->id
         ));

@@ -1,17 +1,4 @@
 <?php
-
-/**
- * CodeIgniter
- *
- * @package   CodeIgniter
- * @author    EllisLab Dev Team
- * @copyright Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
- * @copyright Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
- * @license   http://opensource.org/licenses/MIT  MIT License
- * @link      http://codeigniter.com
- * @since     Version 1.0.0
- */
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
@@ -19,10 +6,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * @class       MY_ModelManager
  * @package     CodeIgniter
- * @subpackage  Core
  * @category    Core
- * @author      Gregory CARRODANO
- * @version     20151221
+ * @author      Gregory CARRODANO <g.carrodano@gmail.com>
+ * @version     20160407
+ * @used-by     ./model/MY_Model.php
  */
 final class ModelManager
 {
@@ -32,7 +19,7 @@ final class ModelManager
      * @var array
      * @private
      */
-    private $db_result = NULL;
+    private $db_result = null;
     /**
      * Model <-> Entities attributes (datas) auto-remap. That's the core of our Manager task : each time a new Model Instance is created, we loop through that Model map to assign each stored Entity data to the corresponding Model attribute
      * @var array
@@ -50,7 +37,7 @@ final class ModelManager
      * @var ModelManager
      * @private
      */
-    private static $_instance = NULL;
+    private static $_instance = null;
 
     /**
      * Class constructor override : prevent direct object creation
@@ -76,7 +63,7 @@ final class ModelManager
      */
     public static function get_instance()
     {
-        if (static::$_instance !== NULL) {
+        if (static::$_instance !== null) {
             return static::$_instance;
         }
 
@@ -117,7 +104,7 @@ final class ModelManager
      */
     public function reset_db_result()
     {
-        $this->db_result = NULL;
+        $this->db_result = null;
     }
 
     /**
@@ -127,7 +114,7 @@ final class ModelManager
      * @param  string
      * @return array
      */
-    public function get_map($model = NULL)
+    public function get_map($model = null)
     {
         return ( ! empty($model)) ? $this->map[$model] : $this->map;
     }
@@ -151,7 +138,7 @@ final class ModelManager
      * @param  string
      * @return array
      */
-    public function get_models($model = NULL)
+    public function get_models($model = null)
     {
         return ( ! empty($model)) ? $this->models[$model] : $this->models;
     }
@@ -177,7 +164,7 @@ final class ModelManager
      * @param  mixed
      * @param  string
      */
-    private function _stack_data(&$prop, $model, $value, $key = NULL)
+    private function _stack_data(&$prop, $model, $value, $key = null)
     {
         if ( ! is_null($key)) {
             $prop[$model][$key] = $value;
@@ -190,4 +177,4 @@ final class ModelManager
 
 
 /* End of file ModelManager.php */
-/* Location: ./application/core/ModelManager.php */
+/* Location: ./application/third_party/model/Manager/ModelManager.php */
