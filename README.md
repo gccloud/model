@@ -9,7 +9,7 @@ CodeIgniter 3 Model extension, working with maltyxx Origami package (see https:/
 ## Step 1 : Installation (by Composer)
 #### Option 1 : Run composer
 ```shell
-composer require gccloud/parser
+composer require gccloud/model
 ```
 #### Option 2 : or edit /composer.json
 ```json
