@@ -314,8 +314,9 @@ class MY_Model extends CI_Model
         if (! empty($db_result)) {
             foreach ($db_result as $d) {
                 $instance = new static();
+                $instance->_do_remap($d);
 
-                $return[] = $instance->_do_remap($d);
+                $return[] = $instance;
             }
         }
 
