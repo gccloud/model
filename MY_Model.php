@@ -251,6 +251,8 @@ class MY_Model extends CI_Model
                     $entity->save();
                 }
             }
+
+            $this->_reset();
         }
     }
 
