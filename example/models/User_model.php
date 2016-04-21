@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class User_model extends MY_Model
 {
@@ -53,8 +53,9 @@ class User_model extends MY_Model
         $user_entity->save();
 
         // Stores entity result, remaps it, and creates a new instance
-        return $this->store_result($user_entity)
-            ->_insert();
+        return $this
+            ->storeResult($user_entity)
+            ->getInstance();
     }
 
     /**
@@ -66,35 +67,37 @@ class User_model extends MY_Model
     public function get($user_id)
     {
         // Gets back informations from the entity, stores result, remaps it, creates a new instance, calls other models attached to this one, and finally returns the fully prepared instance
-        return $this->store_result(new \Entity\mymodelexample\user($user_id))
-            ->_get()
-            ->get_address()
-            ->get_group();
+        return $this
+            ->storeResult(new \Entity\mymodelexample\user($user_id))
+            ->getInstance()
+            ->getAddress()
+            ->getGroup();
     }
 
     /**
-    * [Manager method] : Returns a list of User instance
-    * @method get_list_v1
+    * [Manager method] : Returns a list of User instance (short version)
+    * @method getListV1
     * @public
     * @return array
     */
-    public function get_list_v1()
+    public function getListV1()
     {
         /* VERSION 1 : returns User datas only */
 
         // Gets back entity informations, stores result, remaps it, and returns the instance list
-        return $this->store_result_list(\Entity\mymodelexample\user::order_by('id', 'ASC')
-                ->find())
-            ->_get_list();
+        return $this
+            ->storeResultList(\Entity\mymodelexample\user::order_by('id', 'ASC')
+            ->find())
+            ->getInstanceList();
     }
 
     /**
-    * [Manager method] : Returns a list of User instance
-    * @method get_list_v2
+    * [Manager method] : Returns a list of User instance (complex version)
+    * @method getListV2
     * @public
     * @return array
     */
-    public function get_list_v2()
+    public function getListV2()
     {
         /* VERSION 2 : returns User datas, completed with their Address and Usergroup datas */
 
@@ -108,10 +111,10 @@ class User_model extends MY_Model
         // Loops on every entity result
         foreach($entity_result as $entity) {
             // Stores result, remaps it, creates a new instance, calls other models attached to this one, and adds the fully prepared instance it to the result list
-            $user_list[] = $this->store_result($entity)
-                ->_get()
-                ->get_address()
-                ->get_group();
+            $user_list[] = $this->storeResult($entity)
+                ->getInstance()
+                ->getAddress()
+                ->getGroup();
         }
 
         // Finally returns the instance list
@@ -142,24 +145,25 @@ class User_model extends MY_Model
 
     /**
     * [Instance method] : Adds an Address instance for current User
+    * @method addAddress
+    * @public
     * @return \Address_model
     */
-    public function add_address($data = array())
+    public function addAddress($data = array())
     {
         $this->address = $this->address_model->insert($data);
 
-        $this->set(array(
-            'address_id' => $this->address->id
-        ));
+        $this->address_id = $this->address->id;
+        $this->setInstance();
     }
 
     /**
     * [Instance method] : Returns an Address instance for current User
-    * @method get_address
+    * @method getAddress
     * @public
     * @return \User_model
     */
-    public function get_address()
+    public function getAddress()
     {
         $this->address = $this->address_model->get($this->address_id);
 
@@ -171,18 +175,18 @@ class User_model extends MY_Model
     * @method set_address
     * @public
     */
-    public function set_address($data)
+    public function setAddress($data)
     {
-        $this->address->set($data);
+        $this->address->setInstance($data);
     }
 
     /**
     * [Instance method] : Returns a Usergroup instance for the current User
-    * @method get_group
+    * @method getGroup
     * @public
     * @return \User_model
     */
-    public function get_group()
+    public function getGroup()
     {
         $this->group = $this->usergroup_model->get($this->group_id);
 

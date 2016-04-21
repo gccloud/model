@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @package     CodeIgniter
  * @category    Helper
  * @author      Gregory CARRODANO <g.carrodano@gmail.com>
- * @version     20160407
+ * @version     20160415
  * @used-by     ./model/MY_Model.php
  */
 
@@ -35,48 +35,59 @@ if ( ! function_exists('Manager')) {
     function Manager()
     {
         static $manager;
-        isset($manager) or $manager = ModelManager::get_instance();
+        isset($manager) or $manager = ModelManager::getInstance();
 
         return $manager;
     }
 }
 
-if ( ! function_exists('model_debug')) {
+if ( ! function_exists('modelDebug')) {
     /**
     * Utility function : Model debugger. Will ensure and validate the mapping of a specified Model, or every one (in case no argument is passed)
-    * @method model_debug
+    * @method modelDebug
+    * @param  string
     * @return boolean
     */
-    function model_debug($model = null)
+    function modelDebug($model = null)
     {
-        $CI = CI();
+        CI()->load->database();
+        CI()->load->dbutil();
 
-        $CI->load->database();
-        $CI->load->dbutil();
-
-        $map_list = Manager()->get_map($model);
+        $map_list = Manager()->getMap($model);
         is_array($map_list) or $map_list = array($map_list);
 
-        foreach ($map_list as $map) {
+        foreach ($map_list as $model => $map) {
+            $primary_key = false;
             foreach ($map as $key => $value) {
                 $parts = explode('.', $key);
-                if ( ! $CI->dbutil->database_exists($parts[1])) {
-                    $debug = debug_backtrace();
-                    show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[1].' is not a valid database name.<br /><br /><b>Filename :</b> '.get_class($debug[0]['object']));
+                // Database name verification
+                if ( ! CI()->dbutil->database_exists($parts[1])) {
+                    show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[1].' is not a valid database name.<br /><br /><b>Filename :</b> '.$model.'.php');
+                    die;
                 }
-                if ( ! $CI->db->table_exists($parts[2])) {
-                    $debug = debug_backtrace();
-                    show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[2].' is not a valid table name.<br /><br /><b>Filename :</b> '.get_class($debug[0]['object']));
+                // Table name verification
+                if ( ! CI()->db->table_exists($parts[2])) {
+                    show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[2].' is not a valid table name.<br /><br /><b>Filename :</b> '.$model.'.php');
+                    die;
                 }
-                if ( ! $CI->db->field_exists($parts[3], $parts[2])) {
-                    $debug = debug_backtrace();
-                    show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[3].' is not a valid field name.<br /><br /><b>Filename :</b> '.get_class($debug[0]['object']));
+                // Field name verification
+                if ( ! CI()->db->field_exists($parts[3], $parts[2])) {
+                    show_error('Remap declaration error for attribute "'.$value.'" : '.$parts[3].' is not a valid field name.<br /><br /><b>Filename :</b> '.$model.'.php');
+                    die;
                 }
+                // Primary keay verification
+                $primary_key = ($primary_key || $parts[3] === 'id');
+            }
+            if (! $primary_key) {
+                show_error('Remap declaration error : missing "id" attribute !<br /><br /><b>Filename :</b> '.$model.'.php');
+                die;
             }
         }
 
-        return true;
+        echo('<h1>Model Debbuger ended without any problem. Every Model seems correctly remaped, good work ! ;)</h1>');
+        die;
     }
+
 }
 
 

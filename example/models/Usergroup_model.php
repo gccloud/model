@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Usergroup_model extends MY_Model
 {
@@ -26,13 +26,15 @@ class Usergroup_model extends MY_Model
     * [Manager method] : Returns a new Usergroup instance
     * @method get
     * @public
+    * @param  integer
     * @return \Usergroup_model
     */
     public function get($usergroup_id)
     {
         // Gets back informations from the entity, stores result, remaps it, and returns a new instance
-        return $this->store_result(new \Entity\mymodelexample\enumusergroup($usergroup_id))
-            ->_get();
+        return $this
+            ->storeResult(new \Entity\mymodelexample\enumusergroup($usergroup_id))
+            ->getInstance();
         /*
             ************************************
             *   Details (unfactorized calls)   *
@@ -40,9 +42,9 @@ class Usergroup_model extends MY_Model
             * First, gets back informations from the entity
                 $entity = new \Entity\mymodelexample\enumusergroup($usergroup_id);
             * Then stores the entity result
-                $this->store_result($entity);
+                $this->storeResult($entity);
             * Remaps it, creating a new instance
-                $new_instance = $this->_get();
+                $new_instance = $this->getInstance();
             * Finally returns that instance
                 return $new_instance;
             ************************************
@@ -55,12 +57,13 @@ class Usergroup_model extends MY_Model
     * @public
     * @return array
     */
-    public function get_list()
+    public function getList()
     {
         // Gets back informations from the entity, stores result, and returns a new instance list
-        return $this->store_result_list(\Entity\mymodelexample\enumusergroup::order_by('id', 'ASC')
-                ->find())
-            ->_get_list();
+        return $this
+            ->storeResultList(\Entity\mymodelexample\enumusergroup::order_by('id', 'ASC')
+            ->find())
+            ->getInstanceList();
         /*
             ************************************
             *   Details (unfactorized calls)   *
@@ -68,9 +71,9 @@ class Usergroup_model extends MY_Model
             * First, gets back informations from the entity
                 $entity_list = \Entity\mymodelexample\enumusergroup::order_by('id', 'ASC')->find();
             * Then stores the entity result
-                $this->store_result_list($entity_list);
+                $this->storeResultList($entity_list);
             * Remaps it, creating a list of new instance
-                $result_list = $this->_get_list();
+                $result_list = $this->getInstanceList();
             * Finally returns that list
                 return $result_list;
             ************************************

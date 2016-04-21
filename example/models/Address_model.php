@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Address_model extends MY_Model
 {
@@ -19,7 +19,8 @@ class Address_model extends MY_Model
      * @method __construct
      * @public
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -30,7 +31,8 @@ class Address_model extends MY_Model
     * @method insert
     * @public
     */
-    public function insert($data = array()) {
+    public function insert($data = array())
+    {
         // Loads the entity
         $address_entity = new \Entity\mymodelexample\address();
 
@@ -46,13 +48,14 @@ class Address_model extends MY_Model
         $this->store_result($address_entity);
 
         // Remaps entities results and returns a new instance
-        return $this->_insert();
+        return $this->getInstance();
     }
 
     /**
     * [Manager method] : Adds a new entry on the city DB table
     */
-    public function insert_city($data = array()) {
+    public function insertCity($data = array())
+    {
         // Loads the entity
         $city_entity = new \Entity\mymodelexample\city();
 
@@ -69,7 +72,8 @@ class Address_model extends MY_Model
     /**
     * [Manager method] : Adds a new entry on the country DB table
     */
-    public function insert_country($data = array()) {
+    public function insertCountry($data = array())
+    {
         // Loads the entity
         $country_entity = new \Entity\mymodelexample\country();
 
@@ -87,35 +91,39 @@ class Address_model extends MY_Model
      * @param  int
      * @return \Address_model
      */
-    public function get($address_id) {
+    public function get($address_id)
+    {
         // Get back informations from the entities
         $address_entity = new \Entity\mymodelexample\address($address_id);
         $city_entity = $address_entity->city()->find_one();
         $country_entity = $city_entity->country()->find_one();
 
         // Stores entity result, remaps it, and returns a new instance
-        return $this->store_result(array($address_entity, $city_entity, $country_entity))
-            ->_get();
+        return $this
+            ->storeResult(array($address_entity, $city_entity, $country_entity))
+            ->getInstance();
     }
 
     /**
      * [Instance method] : Updates current Address
      * @param array
      */
-    public function set($data = array()) {
+    public function set($data = array())
+    {
         // Loads the entity
         $address_entity = new \Entity\mymodelexample\address($this->id);
 
         // Sets entity informations
-        foreach($data as $key => $value) {
+        foreach ($data as $key => $value) {
             $address_entity->$key = $value;
         }
         // Saves them
         $address_entity->save();
 
         // Stores entity result, and updates the instance
-        $this->store_result($address_entity)
-            ->_set();
+        $this
+            ->storeResult($address_entity)
+            ->setInstance();
     }
 
 }

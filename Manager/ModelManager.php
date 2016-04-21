@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @package     CodeIgniter
  * @category    Core
  * @author      Gregory CARRODANO <g.carrodano@gmail.com>
- * @version     20160407
+ * @version     20160415
  * @used-by     ./model/MY_Model.php
  */
 final class ModelManager
@@ -27,7 +27,7 @@ final class ModelManager
      */
     private $map = array();
     /**
-     * Other models dependencies storage. This will allow to control which model can be accessed by another one (thus defining a proper "hierarchy" among all of the application's models)
+     * Other Models dependencies storage. This will allow to control which Model can be accessed by another one (thus defining a proper "hierarchy" among all of the application's Models)
      * @var array
      * @private
      */
@@ -56,12 +56,12 @@ final class ModelManager
     /* MAIN FUNCTIONS */
 
     /**
-     * Returns new or existing Singleton instance
-     * @method get_instance
+     * Returns a new or existing Singleton instance
+     * @method getInstance
      * @public
      * @return ModelManager
      */
-    public static function get_instance()
+    public static function getInstance()
     {
         if (static::$_instance !== null) {
             return static::$_instance;
@@ -73,100 +73,105 @@ final class ModelManager
     }
 
     /**
-     * [get_db_result description]
-     * @method get_db_result
+     * Gets back any Entity stored in the Manager
+     * @method getDbResult
      * @public
      * @return array
      */
-    public function get_db_result()
+    public function getDbResult()
     {
         return $this->db_result;
     }
 
     /**
-     * [stack_db_result description]
-     * @method stack_db_result
+     * Registers - if any - some new Entities before running the Model remap process
+     * @method stackDbResult
      * @public
      * @param  mixed
+     * @param  string
      */
-    public function stack_db_result($entity)
+    public function stackDbResult($entity, $extra_key = null)
     {
-        if(is_array($entity)) {
+        if (is_array($entity)) {
             $this->db_result = $entity;
         } else {
-            $this->db_result[] = $entity;
+            if (! empty($extra_key)) {
+                $this->db_result[$extra_key] = $entity;
+            } else {
+                $this->db_result[] = $entity;
+            }
         }
     }
 
     /**
-     * [reset_db_result description]
-     * @method reset_db_result
+     * Resets any Entity result previously stored here (though this function is public, it should usually only be called internally, and after ending a Model auto-remap process)
+     * @method resetDbResult
      */
-    public function reset_db_result()
+    public function resetDbResult()
     {
         $this->db_result = null;
     }
 
     /**
-     * [get_map description]
-     * @method get_map
+     * Fetches back some Model mapping previously stored on the Manager (wether to return the whole map, or just for one Model, is determined by the optional parameter passed when calling this function)
+     * @method getMap
      * @public
      * @param  string
      * @return array
      */
-    public function get_map($model = null)
+    public function getMap($model = null)
     {
-        return ( ! empty($model)) ? $this->map[$model] : $this->map;
+        return (! empty($model)) ? $this->map[$model] : $this->map;
     }
 
     /**
-     * [stack_map description]
-     * @method stack_map
+     * Registers a new Model mapping (i.e a new list of Model <-> Entities attributes matching)
+     * @method stackMap
      * @public
      * @param  string
      * @param  array
      */
-    public function stack_map($model, $key, $value)
+    public function stackMap($model, $key, $value)
     {
-        $this->_stack_data($this->map, $model, $value, $key);
+        $this->_stackData($this->map, $model, $value, $key);
     }
 
     /**
-     * [get_models description]
-     * @method get_models
+     * Fetches back some Model hierarchy previously stored on the Manager (wether to return the whole map, or just for one Model, is determined by the optional parameter passed when calling this function)
+     * @method getModels
      * @public
      * @param  string
      * @return array
      */
-    public function get_models($model = null)
+    public function getModels($model = null)
     {
-        return ( ! empty($model)) ? $this->models[$model] : $this->models;
+        return (! empty($model)) ? $this->models[$model] : $this->models;
     }
 
     /**
-     * [stack_models description]
-     * @method stack_models
+     * Registers a new Model dependency (i.e a new "sub-Model" called by another "Master" one)
+     * @method stackModel
      * @public
      * @param  string
      * @param  array
      */
-    public function stack_model($model, $value)
+    public function stackModel($model, $value)
     {
-        $this->_stack_data($this->models, $model, $value);
+        $this->_stackData($this->models, $model, $value);
     }
 
     /**
-     * [_stack_data description]
-     * @method _stack_data
+     * Generic Manager data storage function : will be called internally to store some utility datas for further use
+     * @method _stackData
      * @private
      * @param  mixed
      * @param  string
      * @param  mixed
      * @param  string
      */
-    private function _stack_data(&$prop, $model, $value, $key = null)
+    private function _stackData(&$prop, $model, $value, $key = null)
     {
-        if ( ! is_null($key)) {
+        if (! is_null($key)) {
             $prop[$model][$key] = $value;
         } else {
             $prop[$model][] = $value;
