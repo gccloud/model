@@ -223,7 +223,7 @@ class MY_Model extends CI_Model
         // And then loop through it
         foreach ($attribute_list as $key => $attribute) {
             // Each attribute must be processed specifically according to it's type
-            if (! empty($this->$key)) {
+            if (! is_null($this->$key)) {
                 // Is it an array (probably an array of Model Instances) ?
                 if (is_array($this->$key)) {
                     // If so, we've got to loop through it, and set every Model Instance found
