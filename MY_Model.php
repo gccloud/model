@@ -298,12 +298,12 @@ class MY_Model extends CI_Model
             foreach ($db_result as $d) {
                 $this->_forwardMap($d);
             }
+
+            $return = clone $this;
         }
 
         // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
         // unset($db_result);
-
-        $return = clone $this;
 
         $this->_reset(true);
         return $return;
@@ -317,11 +317,13 @@ class MY_Model extends CI_Model
      */
     private function _forwardRemapList()
     {
-        $return = array();
+        $return = null;
 
         $db_result = Manager()->getDbResult();
 
         if (! empty($db_result)) {
+            $return = array();
+
             foreach ($db_result as $d) {
                 $instance = new static();
                 $instance->_forwardMap($d);
