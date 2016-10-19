@@ -157,7 +157,9 @@ final class ModelManager
      */
     public function stackModel($model, $value)
     {
-        $this->_stackData($this->models, $model, $value);
+        $explode = explode('/', $value);
+
+        $this->_stackData($this->models, $model, end($explode));
     }
 
     /**
