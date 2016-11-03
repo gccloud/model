@@ -136,9 +136,6 @@ class MY_Model extends CI_Model
      */
     protected function storeResult($data = array())
     {
-        // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-        // $Manager = Manager();
-
         // First, we've got to insure that something was actually passed to the function call
         if (! empty($data)) {
             // If so, we auto-convert the argument passed (in case it's not an array)
@@ -146,14 +143,9 @@ class MY_Model extends CI_Model
 
             // Now we can loop through our DB datas, and store it on the current Manager instance
             foreach ($data as $d) {
-                // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-                // $Manager->stack_db_result($d);
                 Manager()->stackDbResult($d);
             }
         }
-
-        // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-        // unset($Manager)
 
         // And finally return the current instance itslef (allowing "CI's like" chaining method calls)
         return $this;
