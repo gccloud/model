@@ -378,20 +378,22 @@ class MY_Model extends CI_Model
 
         // Then we can begin to work
         // First of all, we've got to determine the Entity we're about to work on
-        $target = explode('.', $flipped_map[$key]);
-        $entity_chain = '\\'.$target[0].'\\'.$target[1].'\\'.$target[2];
+        if (isset($flipped_map[$key])) {
+            $target = explode('.', $flipped_map[$key]);
+            $entity_chain = '\\'.$target[0].'\\'.$target[1].'\\'.$target[2];
 
-        // Then, we'll check if it was already declared before
-        if (isset($db_result[$target[2]])) {
-            // If so, we fetch it back from the Manager, set the new value, and stores it again
-            $entity = $db_result[$target[2]];
-            (! isset($entity->$target[3])) or $entity->$target[3] = $this->$key;
-            Manager()->stackDbResult($entity, $target[2]);
-        } else {
-            // If not, we simply instanciate it, set the new value, and stores it for future use
-            $entity = new $entity_chain($this->id);
-            (! isset($entity->$target[3])) or $entity->$target[3] = $this->$key;
-            Manager()->stackDbResult($entity, $target[2]);
+            // Then, we'll check if it was already declared before
+            if (isset($db_result[$target[2].'_'.$this->id])) {
+                // If so, we fetch it back from the Manager, set the new value, and stores it again
+                $entity = $db_result[$target[2].'_'.$this->id];
+                (! isset($entity->$target[3])) or $entity->$target[3] = $this->$key;
+                Manager()->stackDbResult($entity, $target[2].'_'.$this->id);
+            } else {
+                // If not, we simply instanciate it, set the new value, and stores it for future use
+                $entity = new $entity_chain($this->id);
+                (! isset($entity->$target[3])) or $entity->$target[3] = $this->$key;
+                Manager()->stackDbResult($entity, $target[2].'_'.$this->id);
+            }
         }
     }
 
@@ -406,7 +408,6 @@ class MY_Model extends CI_Model
         // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
         // $Manager = Manager();
 
-        // $Manager->reset_db_result();
         Manager()->resetDbResult();
 
         if ($new_instance) {
