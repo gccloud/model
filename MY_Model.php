@@ -59,8 +59,8 @@ class MY_Model extends CI_Model
         // This method should ONLY be called when trying to access another CI's DB Object or model, so these are the only verifications we'll do here.
         if (strpos($key, 'db_') !== false) {
             if (! isset(CI()->$key)) {
-                CI()->$key = CI()->load->database(str_replace('db_', '', $key), TRUE);
-    			CI()->$key->initialize();
+                CI()->$key = CI()->load->database(str_replace('db_', '', $key), true);
+                CI()->$key->initialize();
             }
 
             return parent::__get($key);
@@ -349,7 +349,7 @@ class MY_Model extends CI_Model
                 foreach ($db_keys as $key => $value) {
                     $attr = $db_table.'.'.$key;
                     if (array_key_exists($attr, $map)) {
-                        $this->$map[$attr] = $value;
+                        $this->{$map[$attr]} = $value;
                     }
                 }
             }
@@ -424,7 +424,6 @@ class MY_Model extends CI_Model
             // unset($map);
         }
     }
-
 }
 
 
