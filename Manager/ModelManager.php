@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * CodeIgniter Model Manager Class : standard CI_Model Class override, which allows to design DB "Manager" classes
@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @package     CodeIgniter
  * @category    Core
  * @author      Gregory CARRODANO <g.carrodano@gmail.com>
- * @version     20160415
+ * @version     20171020
  * @used-by     ./model/MY_Model.php
  */
 final class ModelManager
@@ -21,44 +21,39 @@ final class ModelManager
      */
     private $db_result = null;
     /**
-     * Model <-> Entities attributes (datas) auto-remap. That's the core of our Manager task : each time a new Model Instance is created, we loop through that Model map to assign each stored Entity data to the corresponding Model attribute
+     * Model <--> Entities attributes (datas) auto-remap. That's the core of our Manager task : each time a new Model Instance is created, we loop through that Model map to assign each stored Entity data to the corresponding Model attribute
      * @var array
-     * @private
      */
     private $map = array();
     /**
      * Other Models dependencies storage. This will allow to control which Model can be accessed by another one (thus defining a proper "hierarchy" among all of the application's Models)
      * @var array
-     * @private
      */
     private $models = array();
     /**
      * Singleton instance
      * @var ModelManager
-     * @private
      */
     private static $_instance = null;
 
     /**
      * Class constructor override : prevent direct object creation
-     * @method __construct
-     * @private
      */
-    private function  __construct() { }
+    private function __construct()
+    {
+    }
 
     /**
      * Class cloning override : prevent object cloning
-     * @method __clone
-     * @private
      */
-    private function  __clone() { }
+    private function __clone()
+    {
+    }
 
     /* MAIN FUNCTIONS */
 
     /**
      * Returns a new or existing Singleton instance
-     * @method getInstance
-     * @public
      * @return ModelManager
      */
     public static function getInstance()
@@ -74,8 +69,6 @@ final class ModelManager
 
     /**
      * Gets back any Entity stored in the Manager
-     * @method getDbResult
-     * @public
      * @return array
      */
     public function getDbResult()
@@ -85,8 +78,6 @@ final class ModelManager
 
     /**
      * Registers - if any - some new Entities before running the Model remap process
-     * @method stackDbResult
-     * @public
      * @param  mixed
      * @param  string
      */
@@ -105,7 +96,6 @@ final class ModelManager
 
     /**
      * Resets any Entity result previously stored here (though this function is public, it should usually only be called internally, and after ending a Model auto-remap process)
-     * @method resetDbResult
      */
     public function resetDbResult()
     {
@@ -114,8 +104,6 @@ final class ModelManager
 
     /**
      * Fetches back some Model mapping previously stored on the Manager (wether to return the whole map, or just for one Model, is determined by the optional parameter passed when calling this function)
-     * @method getMap
-     * @public
      * @param  string
      * @return array
      */
@@ -125,9 +113,7 @@ final class ModelManager
     }
 
     /**
-     * Registers a new Model mapping (i.e a new list of Model <-> Entities attributes matching)
-     * @method stackMap
-     * @public
+     * Registers a new Model mapping (i.e a new list of Model <--> Entities attributes matching)
      * @param  string
      * @param  array
      */
@@ -138,8 +124,6 @@ final class ModelManager
 
     /**
      * Fetches back some Model hierarchy previously stored on the Manager (wether to return the whole map, or just for one Model, is determined by the optional parameter passed when calling this function)
-     * @method getModels
-     * @public
      * @param  string
      * @return array
      */
@@ -150,8 +134,6 @@ final class ModelManager
 
     /**
      * Registers a new Model dependency (i.e a new "sub-Model" called by another "Master" one)
-     * @method stackModel
-     * @public
      * @param  string
      * @param  array
      */
@@ -164,8 +146,6 @@ final class ModelManager
 
     /**
      * Generic Manager data storage function : will be called internally to store some utility datas for further use
-     * @method _stackData
-     * @private
      * @param  mixed
      * @param  string
      * @param  mixed
@@ -179,7 +159,6 @@ final class ModelManager
             $prop[$model][] = $value;
         }
     }
-
 }
 
 

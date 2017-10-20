@@ -12,7 +12,7 @@ require_once(__DIR__.'/Utility/ModelHelper.php');
  * @package     CodeIgniter
  * @category    Core
  * @author      Gregory CARRODANO <g.carrodano@gmail.com>
- * @version     20160415
+ * @version     20171020
  * @uses        ./model/Manager/ModelManager.php
  *              ./model/Utility/ModelHelper.php
  */
@@ -22,8 +22,6 @@ class MY_Model extends CI_Model
 
     /**
      * Class constructor
-     * @method __construct
-     * @public
      * @return void
      */
     public function __construct()
@@ -41,16 +39,11 @@ class MY_Model extends CI_Model
                     }
                 }
             }
-
-            // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-            // unset($datas);
         }
     }
 
     /**
      * __get magic override
-     * @method __get
-     * @public
      * @param  string
      * @return object
      */
@@ -59,8 +52,8 @@ class MY_Model extends CI_Model
         // This method should ONLY be called when trying to access another CI's DB Object or model, so these are the only verifications we'll do here.
         if (strpos($key, 'db_') !== false) {
             if (! isset(CI()->$key)) {
-                CI()->$key = CI()->load->database(str_replace('db_', '', $key), TRUE);
-    			CI()->$key->initialize();
+                CI()->$key = CI()->load->database(str_replace('db_', '', $key), true);
+                CI()->$key->initialize();
             }
 
             return parent::__get($key);
@@ -75,8 +68,6 @@ class MY_Model extends CI_Model
 
     /**
      * __set magic override
-     * @method __set
-     * @public
      * @param  mixed
      * @param  mixed
      * @return void
@@ -92,8 +83,6 @@ class MY_Model extends CI_Model
 
     /**
      * Other CI Models dependencies declaration
-     * @method add_models
-     * @protected
      * @param  array
      * @return void
      */
@@ -121,16 +110,11 @@ class MY_Model extends CI_Model
 
             // Finally, we can load all previously packed models and store it in our Manager
             CI()->load->model($new_models);
-
-            // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-            // unset($new_models)
         }
     }
 
     /**
      * Stores entity query for future object remap
-     * @method storeResult
-     * @protected
      * @param  mixed
      * @return object
      */
@@ -153,24 +137,17 @@ class MY_Model extends CI_Model
 
     /**
      * Stores entity query for future object remap
-     * @method storeResultList
-     * @protected
      * @param  mixed
      * @return object
      */
     protected function storeResultList($data = array())
     {
-        // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-        // $Manager = Manager();
-
         // First, we've got to insure that something was actually passed to the function call
         if (! empty($data)) {
             // If so, we auto-convert the argument passed (in case it's not an array)
             is_array($data) or $data = array($data);
 
             // Now we can store our DB datas (no loop this time, that's a direct storing call)
-            // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-            // $Manager->stack_db_result($data);
             Manager()->stackDbResult($data);
         }
 
@@ -180,8 +157,6 @@ class MY_Model extends CI_Model
 
     /**
      * Returns a new model Instance
-     * @method getInstance
-     * @public
      * @return object
      */
     public function getInstance()
@@ -191,8 +166,6 @@ class MY_Model extends CI_Model
 
     /**
      * Returns an array of new model Instances
-     * @method getInstanceList
-     * @public
      * @return array
      */
     public function getInstanceList()
@@ -202,8 +175,6 @@ class MY_Model extends CI_Model
 
     /**
      * Updates a model Instance
-     * @method setInstance
-     * @public
      * @param  boolean
      * @return void
      */
@@ -227,9 +198,9 @@ class MY_Model extends CI_Model
                 // Is it a single Model Instance waiting to be set ?
                 } elseif (is_object($this->$key) && strpos(get_class($this->$key), '_model') !== false) {
                     $this->$key->setInstance(false);
-                    // This is the last case. We're facing a simple attribute waiting for our revers-engine remap to do the job !
+                // This is the last case. We're facing a simple attribute waiting for our revers-engine remap to do the job !
                 } else {
-                    // Just a last little control : we're going to remap everything except id, so...
+                    // Just a last control : we're going to remap everything except id, so...
                     ($key === 'id') or $this->_backwardMap($key);
                 }
             }
@@ -252,8 +223,6 @@ class MY_Model extends CI_Model
 
     /**
      * Flattens a Model instance, returning it as an array of key / value pairs
-     * @method to_array
-     * @public
      * @param  string
      * @return array
      */
@@ -276,8 +245,6 @@ class MY_Model extends CI_Model
 
     /**
      * Fetches back all entities datas and sets Model's corresponding attributes
-     * @method _forwardRemapRow
-     * @private
      * @return object
      */
     private function _forwardRemapRow()
@@ -294,17 +261,12 @@ class MY_Model extends CI_Model
             $return = clone $this;
         }
 
-        // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-        // unset($db_result);
-
         $this->_reset(true);
         return $return;
     }
 
     /**
      * Fetches back all entities datas and sets Model's corresponding attributes
-     * @method _forwardRemapList
-     * @private
      * @return array
      */
     private function _forwardRemapList()
@@ -324,17 +286,12 @@ class MY_Model extends CI_Model
             }
         }
 
-        // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-        // unset($db_result);
-
         $this->_reset();
         return $return;
     }
 
     /**
      * Remap processing function (Entity to Model)
-     * @method _forwardMap
-     * @private
      * @param  object
      * @return void
      */
@@ -349,20 +306,15 @@ class MY_Model extends CI_Model
                 foreach ($db_keys as $key => $value) {
                     $attr = $db_table.'.'.$key;
                     if (array_key_exists($attr, $map)) {
-                        $this->$map[$attr] = $value;
+                        $this->{$map[$attr]} = $value;
                     }
                 }
             }
-
-            // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-            // unset($map, $db_table, $db_keys);
         }
     }
 
     /**
      * Reverse remap processing function (Model to Entity)
-     * @method _backwardMap
-     * @private
      * @author Gregory CARRODANO <g.carrodano@santiane.fr>
      * @return void
      */
@@ -399,19 +351,13 @@ class MY_Model extends CI_Model
 
     /**
      * Utility function (internal use only) : clears Model / Manager variables (called right before returning a newly created instance).
-     * @method _reset
-     * @private
      * @return void
      */
     private function _reset($new_instance = false)
     {
-        // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-        // $Manager = Manager();
-
         Manager()->resetDbResult();
 
         if ($new_instance) {
-            // $map = $Manager->get_map(get_class($this));
             $map = Manager()->getMap(get_class($this));
 
             if (is_array($map)) {
@@ -419,12 +365,8 @@ class MY_Model extends CI_Model
                     $this->$m = null;
                 }
             }
-
-            // MICRO-OPTIMIZATION : MUST BE TESTED BEFORE BEING INTEGRATED
-            // unset($map);
         }
     }
-
 }
 
 
